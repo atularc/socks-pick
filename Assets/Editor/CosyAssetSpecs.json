@@ -1,0 +1,214 @@
+{
+  "assets": [
+    {
+      "name": "CosyLogo",
+      "x": 25,
+      "y": 158,
+      "width": 2112,
+      "height": 415,
+      "border": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "source": "C:\\Users\\zod\\.codex\\generated_images\\01a1b218-a009-7d20-b0d2-f4071d8c8e3f\\exec-5e77412b-30bd-44cc-82fb-82a87bf0607b.png"
+    },
+    {
+      "name": "CosyVine",
+      "x": 174,
+      "y": 238,
+      "width": 404,
+      "height": 1247,
+      "border": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "source": "C:\\Users\\zod\\.codex\\generated_images\\01a1b218-a009-7d20-b0d2-f4071d8c8e3f\\exec-4f334965-f91b-44ad-88a5-64f3ad31c27b.png"
+    },
+    {
+      "name": "CosyTowels",
+      "x": 156,
+      "y": 142,
+      "width": 998,
+      "height": 919,
+      "border": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "source": "C:\\Users\\zod\\.codex\\generated_images\\01a1b218-a009-7d20-b0d2-f4071d8c8e3f\\exec-d4a619b9-8f45-4ea3-8ef4-b4268b285e6e.png"
+    },
+    {
+      "name": "CosyBoard",
+      "x": 13,
+      "y": 12,
+      "width": 1227,
+      "height": 1225,
+      "border": [
+        125.4,
+        125.4,
+        125.4,
+        125.4
+      ],
+      "source": "C:\\Users\\zod\\.codex\\generated_images\\01a1b218-a009-7d20-b0d2-f4071d8c8e3f\\exec-0215d98d-ba1a-4e4e-a6d7-0c40d057370e.png"
+    },
+    {
+      "name": "CosyShell",
+      "x": 21,
+      "y": 16,
+      "width": 1210,
+      "height": 1216,
+      "border": [
+        125.4,
+        125.4,
+        125.4,
+        125.4
+      ],
+      "source": "C:\\Users\\zod\\.codex\\generated_images\\01a1b218-a009-7d20-b0d2-f4071d8c8e3f\\exec-76635e70-f895-4fab-bcd7-a373277442cb.png"
+    },
+    {
+      "name": "CosyButton",
+      "x": 25,
+      "y": 126,
+      "width": 2118,
+      "height": 468,
+      "border": [
+        243.36,
+        102.96,
+        243.36,
+        102.96
+      ],
+      "source": "C:\\Users\\zod\\.codex\\generated_images\\01a1b218-a009-7d20-b0d2-f4071d8c8e3f\\exec-43a31519-5a18-43c5-bd33-4cfa4ec50c85.png"
+    },
+    {
+      "name": "CosySecondary",
+      "x": 21,
+      "y": 95,
+      "width": 2161,
+      "height": 513,
+      "border": [
+        266.76,
+        112.86,
+        266.76,
+        112.86
+      ],
+      "source": "C:\\Users\\zod\\.codex\\generated_images\\01a1b218-a009-7d20-b0d2-f4071d8c8e3f\\exec-cf6bc1de-3355-4b87-818f-b4e6922746e4.png"
+    },
+    {
+      "name": "CosyPopup",
+      "x": 44,
+      "y": 24,
+      "width": 935,
+      "height": 1498,
+      "border": [
+        102.4,
+        153.60000000000002,
+        102.4,
+        384.0
+      ],
+      "source": "C:\\Users\\zod\\.codex\\generated_images\\01a1b218-a009-7d20-b0d2-f4071d8c8e3f\\exec-e806164f-28ce-4ccd-bfee-57b90d31ed74.png"
+    },
+    {
+      "name": "CosyBasket",
+      "x": 125,
+      "y": 34,
+      "width": 1524,
+      "height": 793,
+      "border": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "source": "C:\\Users\\zod\\.codex\\generated_images\\01a1b218-a009-7d20-b0d2-f4071d8c8e3f\\exec-08f7892c-942c-480d-a433-e92dbc2519de.png"
+    },
+    {
+      "name": "CosyNode",
+      "x": 58,
+      "y": 50,
+      "width": 1121,
+      "height": 1151,
+      "border": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "source": "C:\\Users\\zod\\.codex\\generated_images\\01a1b218-a009-7d20-b0d2-f4071d8c8e3f\\exec-4d9c6800-9b62-42a2-b937-91a4c6c2984f.png"
+    },
+    {
+      "name": "CosyGold",
+      "x": 34,
+      "y": 38,
+      "width": 1151,
+      "height": 1175,
+      "border": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "source": "C:\\Users\\zod\\.codex\\generated_images\\01a1b218-a009-7d20-b0d2-f4071d8c8e3f\\exec-4198695e-9199-426b-9a95-a10f98f78235.png"
+    },
+    {
+      "name": "CosyCurrent",
+      "x": 40,
+      "y": 38,
+      "width": 1151,
+      "height": 1163,
+      "border": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "source": "C:\\Users\\zod\\.codex\\generated_images\\01a1b218-a009-7d20-b0d2-f4071d8c8e3f\\exec-4b473f93-10c7-43d8-a922-f0c908a7803e.png"
+    },
+    {
+      "name": "CosyTeal",
+      "x": 15,
+      "y": 95,
+      "width": 2139,
+      "height": 536,
+      "border": [
+        278.72,
+        117.92,
+        278.72,
+        117.92
+      ],
+      "source": "C:\\Users\\zod\\.codex\\generated_images\\01a1b218-a009-7d20-b0d2-f4071d8c8e3f\\exec-64d77914-416c-4fce-9ce2-437deccecfb2.png"
+    },
+    {
+      "name": "CosyRoom",
+      "x": 0,
+      "y": 0,
+      "width": 941,
+      "height": 1672,
+      "border": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "source": "C:\\Users\\zod\\.codex\\generated_images\\01a1b218-a009-7d20-b0d2-f4071d8c8e3f\\exec-244c4b9f-9b55-438a-86d9-11a3fa0c2e53.png"
+    },
+    {
+      "name": "CosyStar",
+      "x": 101,
+      "y": 147,
+      "width": 1038,
+      "height": 977,
+      "border": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "source": "C:\\Users\\zod\\.codex\\generated_images\\01a1b218-a009-7d20-b0d2-f4071d8c8e3f\\exec-a0bf1701-2c1e-4f89-8d07-8d2cdecee547.png"
+    }
+  ]
+}

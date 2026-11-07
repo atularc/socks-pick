@@ -1,0 +1,7 @@
+# Map navigation correction
+
+Saved asset: Assets/Resources/Art/CandyNavigation.png. Created using the built-in image generation tool with Documentation/Theme-Options/B-Soft-Candy.png as reference. Three clickable buttons share one 1024-max texture; no duplicate live lettering or icons are drawn over it. Native preview: Documentation/GUI-Preview/home.png. Other platform exports need a rebuild for this update.
+
+Generation prompt: Extract and faithfully reconstruct ONLY the three bottom navigation BUTTONS from screen 1 MAP in the provided reference board, as production clickable game-button sprites. Preserve the original design, not a redesign. One horizontal row: purple Shop left, wider pink PLAY middle, purple Album right. Include dimensional shop-front icon and exact white Shop label; small softly rounded white play triangle above larger PLAY label; dimensional open-book icon and Album label. Same puffy rounded-square side buttons, rounded middle button, deep coloured lower bevel, fine light top highlight, soft contact shadows, rounded lettering and source spacing. Identical button heights. Width ratio 72:114:72 and height 60. Play triangle about 20 tall. Transparent 12-unit gaps, 4-unit outer margin, no bar behind, no screen/frame or extra decoration. Wide 4.6:1 composition.
+
+Integration uses equal 216-unit button heights, 259/410/259 widths, and preserved unified artwork. Controls QA passes. Reconstruction is not a verified pixel-identical extraction of the source image.

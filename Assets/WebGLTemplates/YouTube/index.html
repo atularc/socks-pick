@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><meta name="theme-color" content="#f3d9aa"><title>Sock Pairs</title>
+<style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#352519;font-family:ui-rounded,system-ui,sans-serif;touch-action:none}canvas{display:block;width:100%;height:100%;outline:none}
+#game-frame{position:fixed;top:0;left:50%;transform:translateX(-50%);width:min(100vw,56.25vh);height:100vh;overflow:hidden;background:#153f3c;container-type:inline-size}
+@supports(height:100dvh){#game-frame{width:min(100vw,56.25dvh);height:100dvh}}
+#loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:6%;background:radial-gradient(ellipse at 10% 5%,#b7783c80,transparent 65%),repeating-linear-gradient(91deg,#55351f 0,#624126 8px,#59371f 18px);color:#ffe1b8;z-index:5}
+.loading-card{width:100%;padding:12% 6%;text-align:center;border:10px solid #b8682a;border-radius:36px;background:radial-gradient(ellipse at 35% 20%,#265e56,#0c3536);box-shadow:0 0 0 3px #f2ba75,inset 0 3px 6px #041c1e,0 12px 0 #663713,0 22px 35px #24150590}
+.loading-card svg{display:block;width:28%;max-width:110px;height:auto;margin:0 auto 24px;filter:drop-shadow(0 3px 1px #001c20)}
+h1{font-size:clamp(26px,10cqw,54px);line-height:1.15;margin:0 0 24px;font-weight:900;letter-spacing:-1px;color:#ffe1b8;text-shadow:0 3px #3e2112}
+p{font-size:clamp(14px,4.5cqw,22px);line-height:1.5;font-weight:650;margin:0 0 30px}
+progress{display:block;width:86%;height:14px;margin:0 auto;border:2px solid #e5aa67;border-radius:10px;overflow:hidden;background:#092e30;accent-color:#ffad68}
+progress::-webkit-progress-bar{background:#092e30}progress::-webkit-progress-value{background:linear-gradient(#ffd697,#ef8c45);border-radius:8px}progress::-moz-progress-bar{background:linear-gradient(#ffd697,#ef8c45)}
+small{display:block;margin-top:20px;font-size:clamp(12px,3.6cqw,17px);line-height:1.5;color:#ffe1b8}
+</style></head><body><div id="game-frame"><canvas id="unity-canvas" tabindex="0" aria-label="Sock Pairs matching puzzle"></canvas><div id="loading" role="status" aria-live="polite"><div class="loading-card"><svg viewBox="0 0 110 110" aria-hidden="true"><g fill="#ffe1b8" stroke="#633316" stroke-width="4" stroke-linejoin="round"><path d="M33 10h26v46L41 82c-11 14-32 2-23-12l15-18z"/><path d="M64 24h27v46L73 96c-11 14-32 2-23-12l14-18z"/><path d="M33 21h26M64 35h27" fill="none"/></g></svg><h1>Sock Pairs</h1><p>A little mess.<br>A lovely match.</p><progress id="progress" value="0" max="1" aria-label="Loading game"></progress><small>Unpacking your laundry...</small></div></div></div>
+<script src="https://www.youtube.com/game_api/v1"></script><script>
+if(typeof ytgame!=="undefined"&&ytgame.IN_PLAYABLES_ENV)ytgame.game.firstFrameReady(); var canvas=document.getElementById('unity-canvas');
+var config={dataUrl:'Build/{{{ DATA_FILENAME }}}',frameworkUrl:'Build/{{{ FRAMEWORK_FILENAME }}}',codeUrl:'Build/{{{ CODE_FILENAME }}}',streamingAssetsUrl:'StreamingAssets',companyName:'Satura Games',productName:'Sock Pairs',productVersion:'1.0.0',devicePixelRatio:Math.min(window.devicePixelRatio||1,1.5,720/Math.max(1,canvas.clientWidth)),matchWebGLToCanvasSize:true};
+var loader=document.createElement('script');loader.src='Build/{{{ LOADER_FILENAME }}}';loader.onload=function(){createUnityInstance(canvas,config,function(p){document.getElementById('progress').value=p;}).then(function(instance){window.sockUnity=instance;}).catch(function(e){document.querySelector('#loading p').textContent='Unable to start. Please reload in a WebGL 2 browser.';console.error(e);});};document.body.appendChild(loader);
+window.addEventListener('contextmenu',function(e){e.preventDefault();});
+</script></body></html>
+

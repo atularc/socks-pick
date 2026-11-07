@@ -107,3 +107,39 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# Sock Pairs local build workspaces and tooling caches
+/.build-workspace/
+/.gui-build-workspace/
+node_modules/
+__pycache__/
+*.pyc
+/Tests/bin/
+/Tests/obj/
+!Tests/SockPairs.Tests.csproj
+
+# Generated review captures, historical backups, and packaged deliverables.
+# Production artwork under Assets and source references remain versioned.
+/Documentation/GUI-Preview/
+/Documentation/Editor-Screen-Audit/
+/Documentation/*-Backup/
+/Documentation/Previous-Art/
+/Documentation/Retired-Candy-UI/
+/Documentation/Soft-Candy-Uncompressed-QA/
+/Documentation/**/*.png
+/Documentation/**/*.jpg
+/Documentation/**/*.jpeg
+/Documentation/**/*.webp
+!/Documentation/Reference/*.png
+!/Documentation/Reference/*.jpg
+!/Documentation/Theme-Options/*.png
+/Documentation/**/*.zip
+
+# Local credentials and signing material
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+*.p12
+*.pfx

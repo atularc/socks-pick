@@ -1,0 +1,62 @@
+﻿from pathlib import Path
+import shutil
+r=Path.cwd();src=Path('C:/Users/zod/.codex/generated_images/01a1b092-8a52-7a70-b760-bca7249abcec')
+for f,n in [('exec-c6cb405a-db78-42d4-910f-2ce8dd986e2b.png','CandySurfacePink.png'),('exec-323b0189-de37-4d45-ab54-e88e68f3a914.png','CandySurfacePurple.png'),('exec-f9b64529-b1e6-4fa9-ae9c-d79530cf4256.png','CandySurfaceCard.png'),('exec-8e3e0029-8140-4cd7-a218-ae30be3cbc24.png','CandyMapBackground.png')]:shutil.copy2(src/f,r/'Assets/Resources/Art'/n)
+for w in [600,700]:shutil.copy2(r/f'Documentation/Fonts/fredoka{w}.ttf',r/f'Assets/Resources/Fonts/Fredoka{w}.ttf')
+# Retire the old typeface so it adds no player bytes.
+for p in (r/'Assets/Resources/Fonts').glob('Lilita*'):shutil.move(str(p),str(r/'Documentation/Fonts'/p.name))
+p=Path('Assets/Editor/ArtImporter.cs');s=p.read_text().replace('GetVersion(){return 2;}','GetVersion(){return 3;}').replace('            i.npotScale=TextureImporterNPOTScale.None;','            if(assetPath.Contains("CandySurface")){i.textureType=TextureImporterType.Default;i.maxTextureSize=512;}\n            i.npotScale=TextureImporterNPOTScale.None;');p.write_text(s)
+p=Path('Assets/Editor/BuildTools.cs');s=p.read_text().replace('file.Contains("CandySocks")||file.Contains("CandyIcons")','file.Contains("CandySocks")||file.Contains("CandyIcons")||file.Contains("CandySurface")').replace('!file.Contains("CandySocks")&&!file.Contains("CandyIcons")','!file.Contains("CandySocks")&&!file.Contains("CandyIcons")&&!file.Contains("CandySurface")');p.write_text(s)
+p=Path('Assets/Scripts/Runtime/UI.cs');s=p.read_text().replace('static Font font;','static Font font,bodyFont;\n        static readonly System.Collections.Generic.Dictionary<string,Sprite> surfaces=new System.Collections.Generic.Dictionary<string,Sprite>();')
+s=s.replace('if(!font)font=Resources.Load<Font>("Fonts/LilitaOne-Regular");','if(!font)font=Resources.Load<Font>("Fonts/Fredoka700");\n            if(!bodyFont)bodyFont=Resources.Load<Font>("Fonts/Fredoka600");').replace('t.font=font;t.text=value;','t.font=size>=46?font:bodyFont;t.text=value;')
+a=s.index('        public static Image Panel(');b=s.index('        public static RectTransform ClippedLayer',a)
+s=s[:a]+'''        public static Sprite Surface(string name)
+        {
+            if(surfaces.TryGetValue(name,out var cached)&&cached)return cached;
+            var texture=Resources.Load<Texture2D>("Art/CandySurface"+name);
+            Vector4 bounds=name=="Pink"?new Vector4(100f/2172,139f/724,1971f/2172,440f/724):name=="Purple"?new Vector4(74f/2172,132f/724,2024f/2172,458f/724):new Vector4(63f/1122,71f/1402,995f/1122,1251f/1402);
+            var rect=new UnityEngine.Rect(bounds.x*texture.width,bounds.y*texture.height,bounds.z*texture.width,bounds.w*texture.height);
+            float border=name=="Card"?rect.width*.14f:rect.height*.45f;
+            var sprite=UnityEngine.Sprite.Create(texture,rect,new Vector2(.5f,.5f),100,0,SpriteMeshType.FullRect,new Vector4(border,border,border,border));
+            surfaces[name]=sprite;return sprite;
+        }
+        public static Image Panel(Transform parent,string name,float x,float y,float w,float h,Color color)
+        {
+            if(color.r>.9f&&color.g>.85f&&color.b>.85f)
+            {
+                var face=Box(parent,name,x,y,w,h,Color.white,false);face.sprite=Surface("Card");face.type=Image.Type.Sliced;face.pixelsPerUnitMultiplier=.75f;return face;
+            }
+            Box(parent,name+" shadow",x,y-6,w,h,new Color(.4f,.2f,.65f,.12f));
+            return Box(parent,name,x,y,w,h,color);
+        }
+'''+s[b:]
+a=s.index('        public static Button Button(');b=s.index('        public static void Clear(',a)
+s=s[:a]+'''        public static Button Button(Transform parent,string title,float x,float y,float w,float h,Color color,Action action,int size=32)
+        {
+            var r=Rect(parent,title,x,y,w,h);
+            var face=Box(r,"Face",0,0,w,h,Color.white,false);face.sprite=Surface(color==Pink?"Pink":"Purple");face.type=Image.Type.Sliced;face.pixelsPerUnitMultiplier=.7f;face.raycastTarget=true;
+            string glyph=title=="Resume"||title=="Next"?"play":title=="Restart"||title=="Try again"||title=="Retry"?"restart":title=="Home"?"home":title=="II"?"pause":title=="x"?"close":null;
+            bool iconOnly=glyph=="pause"||glyph=="close";
+            var label=Label(r,iconOnly?"":title,glyph!=null&&!iconOnly?42:0,0,w-24,h-5,size,Color.white);
+            Stroke(label,color==Pink?Hex("BC267E"):Hex("7950B7"),1.4f);
+            if(glyph!=null)Glyph(r,glyph,iconOnly?0:-w*.34f,0,iconOnly?h*.48f:h*.49f,Color.white);
+            var b=r.gameObject.AddComponent<Button>();b.targetGraphic=face;r.gameObject.AddComponent<ButtonMotion>();
+            var colors=b.colors;colors.highlightedColor=Color.white;colors.pressedColor=new Color(.92f,.92f,.92f);colors.selectedColor=Color.white;b.colors=colors;
+            b.onClick.AddListener(()=>{SockGame.Instance?.ButtonSound();action?.Invoke();});return b;
+        }
+        public static void Glyph(Transform parent,string kind,float x,float y,float size,Color tint)
+        {var r=Rect(parent,kind,x,y,size,size);var g=r.gameObject.AddComponent<CandyGlyph>();g.kind=kind;g.color=tint;g.raycastTarget=false;}
+        public static void Switch(Transform parent,float x,float y,bool on,Action action)
+        {
+            var r=Rect(parent,"Toggle",x,y,178,94);
+            var track=Box(r,"Track",0,0,178,94,on?Hex("8DCD56"):Hex("BCACD4"));track.raycastTarget=true;
+            var knob=Circle(r,"White knob",on?42:-42,3,77,Cream);
+            var b=r.gameObject.AddComponent<Button>();b.targetGraphic=track;b.onClick.AddListener(()=>{SockGame.Instance?.ButtonSound();action();});
+        }
+'''+s[b:]
+s=s.replace('public static void DisposeIcons(){if(icons!=null)foreach(var sprite in icons)if(sprite)UnityEngine.Object.Destroy(sprite);icons=null;}','public static void DisposeIcons(){if(icons!=null)foreach(var sprite in icons)if(sprite)UnityEngine.Object.Destroy(sprite);icons=null;foreach(var sprite in surfaces.Values)if(sprite)UnityEngine.Object.Destroy(sprite);surfaces.Clear();}')
+a=s.index('        public static void Wood(');b=s.index('        public static void Cloud(',a)
+s=s[:a]+'''        public static void Wood(Transform parent,int theme=0)
+        {Gradient(parent,Hex("EADFFF"),Hex("F7F0FF"));}
+'''+s[b:]
+p.write_text(s)

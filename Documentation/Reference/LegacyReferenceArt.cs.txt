@@ -1,0 +1,79 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace SockPairs
+{
+    // Reuses the actual six sock drawings and rolled balls embedded in the document.
+    // Background removal happens once when loading; all results share one small atlas.
+    public static class ReferenceArt
+    {
+        public static void Load(Sprite[] socks,Sprite[] balls)
+        {
+            var source=Resources.Load<Texture2D>("Art/reference-sheet");if(!source||!source.isReadable)return;
+            var crops=new List<Texture2D>();
+            RectInt[] bounds={new RectInt(58,180,89,130),new RectInt(183,169,104,114),new RectInt(284,188,103,119),
+                new RectInt(94,331,88,128),new RectInt(237,323,89,132),new RectInt(329,354,90,120)};
+            foreach(var rect in bounds)crops.Add(Crop(source,rect,false));
+            for(int i=0;i<6;i++)crops.Add(Crop(source,new RectInt(955+i*62,834,65,65),true));
+            var atlas=new Texture2D(1024,512,TextureFormat.RGBA32,false);atlas.name="Original document sock atlas";atlas.filterMode=FilterMode.Bilinear;
+            Rect[] packed=atlas.PackTextures(crops.ToArray(),3,1024,false);
+            int[] ids={0,7,2,9,4,11};
+            for(int i=0;i<12;i++)
+            {
+                Rect uv=packed[i];var sprite=Sprite.Create(atlas,new Rect(uv.x*atlas.width,uv.y*atlas.height,uv.width*atlas.width,uv.height*atlas.height),new Vector2(.5f,.5f),100);
+                if(i<6)socks[ids[i]]=sprite;else balls[ids[i-6]]=sprite;
+            }
+            atlas.Apply(false,true);foreach(var texture in crops)Object.Destroy(texture);
+            Resources.UnloadAsset(source);
+        }
+        static Texture2D Crop(Texture2D source,RectInt r,bool ball)
+        {
+            Color[] pixels=source.GetPixels(r.x,source.height-r.y-r.height,r.width,r.height);
+            bool Background(Color c)=>c.r>.70f&&c.g>.54f&&c.b>.36f&&c.r>=c.g&&c.g>=c.b&&c.r-c.b>.045f&&c.r-c.b<.42f;
+            if(ball)
+            {
+                for(int y=0;y<r.height;y++)for(int x=0;x<r.width;x++)
+                    if(Vector2.Distance(new Vector2(x,y),new Vector2(r.width*.5f,r.height*.5f))>r.width*.47f)pixels[y*r.width+x]=Color.clear;
+            }
+            else
+            {
+                // The blue cuff touches the instruction pill in the source illustration.
+                // Clip only that background edge; retain the original sock pixels.
+                if(r.x==183)
+                    for(int y=0;y<r.height;y++)for(int x=0;x<r.width;x++)
+                    {
+                        float imageY=r.y+r.height-1-y,imageX=r.x+x;
+                        float cuffTop=176-(imageX-184)*.16f;
+                        if(imageY<cuffTop-2 || imageY<230&&(imageX<184+(imageY-175)*.21f-2||imageX>228+(imageY-169)*.20f+2))pixels[y*r.width+x]=Color.clear;
+                    }
+                var queue=new Queue<int>();var seen=new bool[pixels.Length];
+                for(int x=0;x<r.width;x++){queue.Enqueue(x);queue.Enqueue((r.height-1)*r.width+x);}
+                for(int y=0;y<r.height;y++){queue.Enqueue(y*r.width);queue.Enqueue(y*r.width+r.width-1);}
+                while(queue.Count>0)
+                {
+                    int p=queue.Dequeue();if(seen[p])continue;seen[p]=true;if(pixels[p].a>0&&!Background(pixels[p]))continue;
+                    pixels[p]=Color.clear;int x=p%r.width,y=p/r.width;
+                    if(x>0)queue.Enqueue(p-1);if(x+1<r.width)queue.Enqueue(p+1);
+                    if(y>0)queue.Enqueue(p-r.width);if(y+1<r.height)queue.Enqueue(p+r.width);
+                }
+                // Ignore neighboring art fragments without changing the sock drawing.
+                var visited=new bool[pixels.Length];var largest=new List<int>();
+                for(int start=0;start<pixels.Length;start++)
+                {
+                    if(visited[start]||pixels[start].a==0)continue;
+                    var component=new List<int>();queue.Enqueue(start);
+                    while(queue.Count>0)
+                    {
+                        int p=queue.Dequeue();if(visited[p]||pixels[p].a==0)continue;visited[p]=true;component.Add(p);
+                        int x=p%r.width,y=p/r.width;
+                        if(x>0)queue.Enqueue(p-1);if(x+1<r.width)queue.Enqueue(p+1);if(y>0)queue.Enqueue(p-r.width);if(y+1<r.height)queue.Enqueue(p+r.width);
+                    }
+                    if(component.Count>largest.Count)largest=component;
+                }
+                var keep=new bool[pixels.Length];foreach(int p in largest)keep[p]=true;
+                for(int p=0;p<pixels.Length;p++)if(!keep[p])pixels[p]=Color.clear;
+            }
+            var result=new Texture2D(r.width,r.height,TextureFormat.RGBA32,false);result.SetPixels(pixels);result.Apply();return result;
+        }
+    }
+}

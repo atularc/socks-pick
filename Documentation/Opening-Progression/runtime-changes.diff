@@ -1,0 +1,51 @@
+--- before/SockGame.cs
++++ after/SockGame.cs
+@@ -226,7 +226,7 @@
+             if(playing&&puzzle!=null&&unlockAllLevelsForTesting&&puzzle.layout.config.level>save.unlocked)
+                 save.active=null; // Do not save a resume point that becomes locked when testing is disabled.
+             else if(playing&&puzzle!=null&&!puzzle.Won)
+-                save.active=new Snapshot{level=puzzle.layout.config.level,selected=puzzle.selected,matched=puzzle.matched,
++                save.active=new Snapshot{level=puzzle.layout.config.level,levelRevision=puzzle.layout.config.revision,selected=puzzle.selected,matched=puzzle.matched,
+                     capacity=puzzle.capacity,moves=puzzle.moves,helpers=helpers,elapsed=elapsed,basket=puzzle.basket.ToArray(),
+                     socks=puzzle.Socks.ToArray(),lost=puzzle.lost,adUsed=adUsed};
+             platform.Save(JsonUtility.ToJson(save));
+@@ -437,6 +437,9 @@
+         void Resume()
+         {
+             var snap=save.active;if(snap==null){StartLevel(save.unlocked);return;}
++            // Changed layouts restart only the active round; campaign progress and rewards are retained.
++            int resumeLevel=Mathf.Clamp(snap.level,1,100);
++            if(snap.levelRevision!=book.levels[resumeLevel-1].revision){StartLevel(resumeLevel);return;}
+             StartLevel(Mathf.Clamp(snap.level,1,100),false);
+             if(snap.socks!=null&&snap.socks.Length==puzzle.Socks.Count)
+             {
+@@ -445,6 +448,7 @@
+                 puzzle.basket.Clear();if(snap.basket!=null)puzzle.basket.AddRange(snap.basket);
+                 elapsed=Mathf.Max(0,snap.elapsed);helpers=snap.helpers;adUsed=snap.adUsed;BuildPlay();
+                 if(puzzle.lost)Lose();
++                Persist();
+             }
+         }
+         public void StartLevel(int level,bool tutorial=true)
+@@ -454,7 +458,7 @@
+             elapsed=0;helpers=0;newDesigns=0;displayedSeconds=-1;hintId=-1;drawer.Clear();playing=true;finishing=false;adUsed=false;doubling=false;lastTap=Time.unscaledTime;showingTutorial=false;
+             BuildPlay();Persist();
+             if(!save.reduceMotion)StartCoroutine(DropIn());
+-            if(tutorial&&(level==1||level%10==1))ShowTutorial(level);
++            if(tutorial&&puzzle.layout.config.HasTutorial)ShowTutorial(level);
+         }
+         void BuildPlay()
+         {
+@@ -903,9 +907,10 @@
+                 "Wet socks need a moment to dry.\nMatch two other pairs and they will be ready.",
+                 "The same design can come in different sizes.\nMatch S with S, L with L, and regular with regular.",
+                 "All your laundry skills come together.\nPlan your picks, watch the basket, and enjoy the tidy."};
+-            int ch=(level-1)/10;var panel=Modal(titles[ch],1050);
++            int ch=(level-1)/10;var config=puzzle.layout.config;
++            var panel=Modal(string.IsNullOrEmpty(config.tutorialTitle)?titles[ch]:config.tutorialTitle,1050);
+             UI.Sprite(panel,"Example",sockArt[ch%24],-100,110,130,130);UI.Sprite(panel,"Example match",sockArt[ch%24],100,110,130,130);
+-            UI.Label(panel,tips[ch],0,-110,710,310,40);
++            UI.Label(panel,string.IsNullOrEmpty(config.tutorialText)?tips[ch]:config.tutorialText,0,-110,710,310,40);
+             UI.Button(panel,"Let's tidy!",0,-365,620,130,UI.Green,CloseModal,52);
+         }
+         RectTransform Modal(string title,float height,Color? ribbon=null)

@@ -1,0 +1,85 @@
+﻿[
+    {
+        "Case":  "screens",
+        "ExitCode":  -1073741819,
+        "Errors":  [
+
+                   ],
+        "Evidence":  [
+                         "SOCK PAIRS SMOKE PASS: runtime match/clear flow and screens captured."
+                     ]
+    },
+    {
+        "Case":  "small",
+        "ExitCode":  -1073741819,
+        "Errors":  [
+
+                   ],
+        "Evidence":  [
+                         "READABILITY QA PASS: level 100 basket visible and count current."
+                     ]
+    },
+    {
+        "Case":  "tall",
+        "ExitCode":  -1073741819,
+        "Errors":  [
+
+                   ],
+        "Evidence":  [
+                         "READABILITY QA PASS: level 100 basket visible and count current."
+                     ]
+    },
+    {
+        "Case":  "tablet",
+        "ExitCode":  -1073741819,
+        "Errors":  [
+
+                   ],
+        "Evidence":  [
+                         "READABILITY QA PASS: level 100 basket visible and count current."
+                     ]
+    },
+    {
+        "Case":  "controls",
+        "ExitCode":  -1073741819,
+        "Errors":  [
+
+                   ],
+        "Evidence":  [
+                         "CONTROLS QA COMPLETE: navigation layout and all six toggles."
+                     ]
+    },
+    {
+        "Case":  "layout",
+        "ExitCode":  -1073741819,
+        "Errors":  [
+
+                   ],
+        "Evidence":  [
+                         "LAYOUT QA PASS: 540x960 scaler=0.5 HUD/footer fit safe bounds.",
+                         "LAYOUT QA PASS: 540x1170 scaler=0.5519851 HUD/footer fit safe bounds.",
+                         "LAYOUT QA PASS: 390x844 scaler=0.3984199 HUD/footer fit safe bounds.",
+                         "LAYOUT QA PASS: 768x1024 scaler=0.6158403 HUD/footer fit safe bounds."
+                     ]
+    },
+    {
+        "Case":  "basket",
+        "ExitCode":  -1073741819,
+        "Errors":  [
+
+                   ],
+        "Evidence":  [
+                         "BASKET QA COMPLETE: five aspect ratios and five occupied slots."
+                     ]
+    },
+    {
+        "Case":  "performance",
+        "ExitCode":  -1073741819,
+        "Errors":  [
+
+                   ],
+        "Evidence":  [
+                         "GUI PERF: frames=180 meanMs=16.67 worstMs=16.67 managedBytesPerFrame=0"
+                     ]
+    }
+]

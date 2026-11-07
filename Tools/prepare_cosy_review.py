@@ -1,0 +1,13 @@
+from pathlib import Path
+p=Path('Tools/package_gui_review.py').read_text(encoding='utf-8')
+p=p.replace("out=root/'Documentation/Fresh-Laundry-GUI'","out=root/'Documentation/Cosy-B/Review'")
+p=p.replace("dest=root/'Builds/FreshLaundry-UX'","dest=root/'Builds/Cosy-B'")
+p=p.replace("'Main screens': [('home.png'","'Main screens': [('map-reference-b.png','Reference B map — level 3'),('home.png'")
+p=p.replace('Fresh Laundry','Cosy Laundry Room · B')
+p=p.replace('These captures use the native QA build; the shop button is absent from Web and YouTube builds.','These are real game captures, not generated mockups. The approved concept is linked below. The map uses B’s two stacked actions; the separate native shop is retained only as a legacy screen.')
+p=p.replace('Revised for clearer hierarchy: compact sock grids, larger centred pairs behind the basket rim, sage play surfaces, honey panels, dimmed popup backgrounds, and a single level route with distinct current, completed and locked states.','Built from approved concept B: warm wood, deep teal felt, peach enamel controls, brown live text, a descending wooden route, and the arched peach reward panel. <a href="../Approved-B.png">Open approved reference B</a>.')
+p=p.replace('#b6cdb3;color:#234d4a">Sage play area','#0d4647;color:#ffd7aa">Teal felt')
+p=p.replace('#f3d9aa;color:#234d4a">Honey panels','#ffa97c;color:#4a210e">Peach enamel')
+p=p.replace('#56877a;color:#fff">Teal trail','#a45e30;color:#fff">Warm wood')
+p=p.replace('#d95442;color:#fff">Coral action','#ffd7aa;color:#4a210e">Brown text')
+Path('Tools/package_cosy_review.py').write_text(p,encoding='utf-8')

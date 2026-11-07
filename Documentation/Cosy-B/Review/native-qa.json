@@ -1,0 +1,63 @@
+﻿[
+    {
+        "Case":  "small",
+        "ExitCode":  -1073741819,
+        "Errors":  [
+
+                   ],
+        "Evidence":  [
+                         "READABILITY QA PASS: level 100 basket visible and count current."
+                     ]
+    },
+    {
+        "Case":  "tall",
+        "ExitCode":  -1073741819,
+        "Errors":  [
+
+                   ],
+        "Evidence":  [
+                         "READABILITY QA PASS: level 100 basket visible and count current."
+                     ]
+    },
+    {
+        "Case":  "tablet",
+        "ExitCode":  -1073741819,
+        "Errors":  [
+
+                   ],
+        "Evidence":  [
+                         "READABILITY QA PASS: level 100 basket visible and count current."
+                     ]
+    },
+    {
+        "Case":  "basket",
+        "ExitCode":  -1073741819,
+        "Errors":  [
+
+                   ],
+        "Evidence":  [
+                         "BASKET QA COMPLETE: five aspect ratios and five occupied slots."
+                     ]
+    },
+    {
+        "Case":  "screens",
+        "ExitCode":  -1073741819,
+        "Errors":  [
+
+                   ],
+        "Evidence":  [
+                         "SOCK PAIRS SMOKE PASS: runtime match/clear flow and screens captured."
+                     ]
+    },
+    {
+        "Case":  "performance",
+        "ExitCode":  -1073741819,
+        "Errors":  [
+
+                   ],
+        "Evidence":  [
+                         "GUI PERF: frames=180 meanMs=16.82 worstMs=27.42 managedBytesPerFrame=0",
+                         "GUI PERF COMPLETE: quality=Very Low graphics=659"
+                     ]
+    }
+]

@@ -1,0 +1,18 @@
+{
+  "Web": {
+    "bytes": 9639212,
+    "largestFile": "Web.data.unityweb",
+    "largestFileBytes": 5183991
+  },
+  "YouTube": {
+    "bytes": 26215127,
+    "largestFile": "YouTube.wasm",
+    "largestFileBytes": 15467386
+  },
+  "apk": {
+    "bytes": 25715776
+  },
+  "aab": {
+    "bytes": 25627668
+  }
+}

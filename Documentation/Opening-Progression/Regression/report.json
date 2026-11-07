@@ -1,0 +1,23 @@
+{
+  "result": "PASS",
+  "testedAt": "2026-11-07T07:21:15.808Z",
+  "loadMs": 1275,
+  "wasmHeapBytes": 67108864,
+  "errors": [],
+  "http": [],
+  "checks": [
+    "album/back pointer input",
+    "settings via pause and live toggles",
+    "locked release-level input",
+    "actual pointer matching",
+    "tutorial flow",
+    "level win",
+    "star/progression save",
+    "next level",
+    "pause/home",
+    "reload/resume",
+    "100-level map wheel input",
+    "landscape resize",
+    "small phone, tall phone and tablet resize"
+  ]
+}

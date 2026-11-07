@@ -1,0 +1,15 @@
+{
+  "result": "PASS",
+  "artifacts": [
+    {
+      "file": "Builds\\Web.zip",
+      "bytes": 7531290,
+      "sha256": "6b50bcebc10b3cd943674bdfabf5b88b453db1041d24a8bae8e78aa43d34adb1"
+    },
+    {
+      "file": "Builds\\SockPairs-YouTube.zip",
+      "bytes": 9447744,
+      "sha256": "c9e3a739411ff6395c21e843ded0d2a44c618c85be082a518483285f0965fd8d"
+    }
+  ]
+}

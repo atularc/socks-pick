@@ -1,0 +1,20 @@
+{
+  "result": "PASS",
+  "testedAt": "2026-11-06T20:32:35.445Z",
+  "loadMs": 1320,
+  "wasmHeapBytes": 67108864,
+  "errors": [],
+  "http": [],
+  "checks": [
+    "locked release-level input",
+    "actual pointer matching",
+    "tutorial flow",
+    "level win",
+    "star/progression save",
+    "next level",
+    "pause/home",
+    "reload/resume",
+    "100-level map wheel input",
+    "landscape resize"
+  ]
+}
