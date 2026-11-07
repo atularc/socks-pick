@@ -526,12 +526,6 @@ namespace SockPairs
             basketFrame=UI.Basket(screen,0,-505,1000,280);
             if(puzzle.capacity>0)
             {
-                int spots=puzzle.capacity;
-                for(int i=0;i<spots;i++)
-                {
-                    var slot=UI.BasketSlot(basketFrame,i,spots);float width=UI.BasketImageRect(basketFrame).width;
-                    UI.Box(basketFrame.transform,"Basket space",slot.x,slot.y,width*Mathf.Min(.09f,.38f/Mathf.Max(1,spots-1)),65,new Color(.87f,.95f,.91f,.55f));
-                }
                 UI.Panel(screen,"Basket counter plate",0,-665,640,70,UI.Cream);
                 basketLabel=UI.Label(screen,"Basket  "+puzzle.basket.Count+" / "+puzzle.capacity,0,-665,600,50,40,UI.Ink);
             }

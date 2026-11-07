@@ -1,0 +1,26 @@
+{
+  "result": "PASS",
+  "testedAt": "2026-11-07T08:39:02.879Z",
+  "completedLevels": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "checks": [
+    "actual pointer completion",
+    "layer reveal",
+    "basket holding and retrieval",
+    "tutorial timing",
+    "stars and level unlocks",
+    "legacy active layout restart preserves rewards",
+    "current layout resume preserves basket"
+  ],
+  "errors": []
+}

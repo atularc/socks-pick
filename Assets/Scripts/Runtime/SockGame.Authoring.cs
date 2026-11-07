@@ -127,7 +127,6 @@ namespace SockPairs
             for(int i=0;i<washer.Length;i++)view.Set("washer:"+i,Named<RectTransform>(view.transform,washer[i]));
             var bin=new[]{"Odd sock bin","Bin lid","Odd sock\nbin"};for(int i=0;i<bin.Length;i++)view.Set("bin:"+i,Named<RectTransform>(view.transform,bin[i]));
             view.Set("washerText",Caption(view.transform,"3 pairs"));view.Set("washerWindow",Named<Image>(view.transform,"Washer window"));
-            var slots=basketFrame.GetComponentsInChildren<RectTransform>(true).Where(r=>r.name=="Basket space").ToArray();for(int i=0;i<7;i++)view.Set("slot"+i,slots[i]);
             BindButton(view,"spot","+1 Slot");BindButton(view,"hint","Hint");BindButton(view,"shuffle","Shuffle");
         }
         void BakeReward(bool last)

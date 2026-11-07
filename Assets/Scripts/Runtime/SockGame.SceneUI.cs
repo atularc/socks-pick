@@ -90,11 +90,6 @@ namespace SockPairs
                 view.Show("clothesline",c.line>0);
                 view.Text("washerText",puzzle.matched>=3?"Ready":Mathf.Max(0,3-puzzle.matched)+" pairs");
                 view.Get<Image>("washerWindow").color=puzzle.matched>=3?UI.Green:UI.Blue;
-                for(int i=0;i<7;i++)
-                {
-                    var slot=view.Get<RectTransform>("slot"+i);slot.gameObject.SetActive(i<puzzle.capacity);
-                    if(i<puzzle.capacity){slot.anchoredPosition=UI.BasketSlot(basketFrame,i,puzzle.capacity);var size=slot.sizeDelta;size.x=UI.BasketImageRect(basketFrame).width*Mathf.Min(.09f,.38f/Mathf.Max(1,puzzle.capacity-1));slot.sizeDelta=size;}
-                }
                 view.Button("spot",()=>Offer("spot"));view.Button("hint",()=>Offer("hint"));view.Button("shuffle",()=>Offer("shuffle"));
             }
             DrawDrawer();DrawSocks(null);UpdateStatus();
