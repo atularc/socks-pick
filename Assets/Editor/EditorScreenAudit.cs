@@ -11,10 +11,12 @@ using UnityEngine.UI;
 
 namespace SockPairs.Editor
 {
+    public sealed class EditorAuditRunner:MonoBehaviour { }
     // Editor-only, file-triggered diagnostics. No runtime/build cost.
     [InitializeOnLoad]
     public static class EditorScreenAudit
     {
+        static GameObject auditHost;
         const string Request = "Temp/screen-audit-request.txt";
         static EditorScreenAudit() { EditorApplication.update += Update; }
         static void Update()
@@ -24,7 +26,7 @@ namespace SockPairs.Editor
             if(command=="loading-scene"&&!EditorApplication.isPlaying){File.Delete(Request);BuildTools.RefreshLoadingScreen();return;}
             if(!EditorApplication.isPlaying)return;
             File.Delete(Request);
-            if(command=="all"){SockGame.Instance.StartCoroutine(Run(SockGame.Instance));return;}
+            if(command=="all"){if(!auditHost){auditHost=new GameObject("Screen audit runner");auditHost.AddComponent<EditorAuditRunner>().StartCoroutine(Run(SockGame.Instance));}return;}
             if (command != "dump") return;
             var output = new StringBuilder();
             foreach (var graphic in UnityEngine.Object.FindObjectsByType<Graphic>(FindObjectsSortMode.None))
@@ -53,7 +55,7 @@ namespace SockPairs.Editor
             try
             {
                 game.save=new SaveData();game.save.reduceMotion=true;game.save.sound=false;game.save.music=false;Call(game,"ApplySound");
-                Call(game,"NewScreen","boot");game.RefreshLoadingView();yield return Snapshot("loading-screen");
+                Call(game,"ShowScreen","Loading","boot");yield return Snapshot("loading-screen");
                 foreach(int level in new[]{1,2,3,7,25,31,100})
                 {
                     game.save.unlocked=level;game.save.active=null;for(int i=0;i<100;i++)game.save.stars[i]=i<level-1?3:0;
@@ -92,8 +94,7 @@ namespace SockPairs.Editor
                 var modal=(RectTransform)typeof(SockGame).GetField("modal",BindingFlags.Instance|BindingFlags.NonPublic).GetValue(game);
                 for(int stars=1;stars<=3;stars++)
                 {
-                    UI.Clear(modal);yield return new WaitForEndOfFrame();RewardBackdrop.Capture(modal);UI.Box(modal,"Dim",0,0,1080,1920,new Color(.03f,.02f,.01f,.55f),false).gameObject.AddComponent<FullBleed>();ReferenceBArt.Rim(modal);
-                    ReferenceReward.Build(modal,stars==3?100:6,stars==3?24:10,stars,stars==3,game.Home);
+                    yield return new WaitForEndOfFrame();Call(game,"BindReward",stars==3?100:6,stars,stars==3?100:1);
                     yield return Snapshot("reward-"+stars+"-stars");
                 }
                 for(int level=1;level<=100;level++)
@@ -104,6 +105,7 @@ namespace SockPairs.Editor
             finally
             {
                 Call(game,"NewScreen","map");game.save=SaveData.Read(original);game.Home();Call(game,"ApplySound");bridge.ready=ready;
+                if(auditHost)UnityEngine.Object.Destroy(auditHost);auditHost=null;
             }
         }
         static IEnumerator Snapshot(string name)

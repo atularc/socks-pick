@@ -1,6 +1,6 @@
 const {chromium}=require('playwright');
 const fs=require('fs'),assert=require('assert');
-const output='Documentation/Opening-Progression/Browser';
+const output=process.env.SOCK_QA_OUTPUT||'Documentation/Opening-Progression/Browser';
 fs.mkdirSync(output,{recursive:true});
 const fixtures=JSON.parse(fs.readFileSync('Documentation/Opening-Progression/layout-fixtures.json'));
 const key='sock-pairs-save-v1';
@@ -14,7 +14,7 @@ const key='sock-pairs-save-v1';
  async function state(){return page.evaluate(k=>JSON.parse(localStorage.getItem(k)),key);}
  async function click(x,y,delay=200){await page.mouse.click(x,y);await page.waitForTimeout(delay);}
  async function shot(name){await page.screenshot({path:output+'/'+name+'.png'});}
- async function inject(save){await page.evaluate(save=>localStorage.setItem('__testSave',JSON.stringify(save)),save);await page.reload();await loaded();await click(270,772,700);}
+ async function inject(save){await page.evaluate(save=>localStorage.setItem('__testSave',JSON.stringify(save)),save);await page.reload();await loaded();}
  function point(sock,active,c){
   let x,y;
   if(sock.place===2){const i=active.basket.indexOf(sock.id),width=224*1524/793;x=width*(.16+.68*i/(active.capacity-1)-.5);y=-505+33.6;}
@@ -22,7 +22,7 @@ const key='sock-pairs-save-v1';
   else{x=(sock.slot%6-2.5)*136+(sock.depth%2===0?-1:1)*sock.depth*3;y=(540-Math.floor(sock.slot/6)*150+sock.depth*6)*.68+31;}
   return [270+x/2,480-y/2];
  }
- await page.goto(process.env.SOCK_URL||'http://127.0.0.1:8871');await loaded();await click(270,772,900);
+ await page.goto(process.env.SOCK_URL||'http://127.0.0.1:8871');await loaded();assert.equal((await state()).active.level,1,'New player opens level 1 without a Play tap');
  let oldLayoutSave,currentSave;const completed=[];
  for(let n=1;n<=10;n++){
   const f=fixtures[n-1];let s=await state();assert.equal(s.active.level,n);assert.equal(s.active.moves,0);assert.equal(s.active.levelRevision,1);

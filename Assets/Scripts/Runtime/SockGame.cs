@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace SockPairs
 {
-    public class SockGame : MonoBehaviour
+    public partial class SockGame : MonoBehaviour
     {
         public static SockGame Instance;
         [Header("Testing")]
@@ -58,7 +58,7 @@ namespace SockPairs
                 sockArt[i]=Sprite.Create(sheet,new Rect((i%6)*w,(3-i/6)*h,w,h),new Vector2(.5f,.5f),100);
                 ballArt[i]=sockArt[i]; // Reuse the fabric sheet for folded-pair effects; no extra atlas.
             }
-            EnsureSceneUI();
+            InitializeSceneViews();
             sound=gameObject.AddComponent<SoundBank>();sound.Initialize();
             platform=gameObject.AddComponent<PlatformBridge>();
             platform.Loaded=OnLoaded;
@@ -69,6 +69,7 @@ namespace SockPairs
         // Called by scene setup in the Editor. Awake reuses these serialized objects.
         public void EnsureSceneUI()
         {
+            if(!authoring&&sceneViews.Count>0)return;
             if(!uiCanvas)
             {
                 var canvasObject=new GameObject("Canvas",typeof(Canvas),typeof(GraphicRaycaster));
@@ -88,6 +89,7 @@ namespace SockPairs
         }
         public void RefreshLoadingView()
         {
+            if(!authoring&&sceneViews.Count>0)return;
             if(!screen)return;
             if(Application.isPlaying)UI.Clear(screen);
             else for(int i=screen.childCount-1;i>=0;i--)DestroyImmediate(screen.GetChild(i).gameObject);
@@ -104,7 +106,7 @@ namespace SockPairs
         }
         void OnLoaded(string json)
         {
-            save=SaveData.Read(json);ApplySound();Home();platform.GameReady();
+            save=SaveData.Read(json);ApplySound();if(save.active!=null)Resume();else StartLevel(save.unlocked);platform.GameReady();
             #if UNITY_EDITOR || DEVELOPMENT_BUILD
             var args=Environment.GetCommandLineArgs();
             for(int i=0;i<args.Length-1;i++)if(args[i]=="-sockLevel"&&int.TryParse(args[i+1],out int level))StartLevel(Mathf.Clamp(level,1,100));
@@ -136,6 +138,7 @@ namespace SockPairs
         }
         void FitMapLayout()
         {
+            if(!authoring)return;
             if(currentScreen!="map"||!screen)return;
             Rect area=Screen.safeArea;float scale=Mathf.Min(area.width/1080f,area.height/1920f);
             float extra=0; // Reference B uses a fixed-proportion stage inside the safe area.
@@ -149,6 +152,7 @@ namespace SockPairs
         }
         void FitShopLayout()
         {
+            if(!authoring)return;
             if(currentScreen!="shop"||!screen)return;
             Rect area=Screen.safeArea;
             float scale=Mathf.Min(area.width/1080f,area.height/1920f);
@@ -163,6 +167,7 @@ namespace SockPairs
         }
         void FitSurfaceLayout()
         {
+            if(!authoring)return;
             if(!screen)return;
             Rect area=Screen.safeArea;float scale=Mathf.Min(area.width/1080f,area.height/1920f);
             float extra=0; // Reference B uses a fixed-proportion stage inside the safe area.
@@ -178,6 +183,7 @@ namespace SockPairs
         }
         void PinScreenEdges()
         {
+            if(!authoring)return;
             foreach(RectTransform item in screen)
             {
                 if(item.GetComponent<FullBleed>()||item.GetComponent<SafeEdgeOffset>())continue;
@@ -196,7 +202,7 @@ namespace SockPairs
         void Update()
         {
             if(save==null||hostPaused)return;
-            if(playing&&!finishing&&modal.childCount==0)
+            if(playing&&!finishing&&!HasOpenPopup)
             {
                 elapsed+=Time.unscaledDeltaTime;saveClock+=Time.unscaledDeltaTime;
                 if(timeLabel&&(int)elapsed!=displayedSeconds){displayedSeconds=(int)elapsed;timeLabel.text=TimeText(elapsed);}
@@ -212,17 +218,17 @@ namespace SockPairs
             }
             if(Input.GetKeyDown(KeyCode.Escape))
             {
-                if(modal.childCount>0){if(playing&&!puzzle.lost)CloseModal();else Home();}else if(playing)Pause();else Home();
+                if(HasOpenPopup){if(playing&&!puzzle.lost)CloseModal();else Home();}else if(playing)Pause();else Home();
             }
         }
         void OnApplicationPause(bool paused){if(paused)Persist();}
         void OnApplicationQuit(){Persist();}
-        void OnDestroy(){foreach(var sprite in sockArt)if(sprite)Destroy(sprite);UI.DisposeIcons();}
+        void OnDestroy(){if(Application.isPlaying){foreach(var sprite in sockArt)if(sprite)Destroy(sprite);UI.DisposeIcons();}}
         void ApplySound(){if(save!=null)sound.Settings(save.sound,save.music,platform.audioAllowed);}
         public void ButtonSound(){if(sound)sound.Play("tap");}
         void Persist()
         {
-            if(save==null)return;
+            if(save==null||authoring)return;
             if(playing&&puzzle!=null&&unlockAllLevelsForTesting&&puzzle.layout.config.level>save.unlocked)
                 save.active=null; // Do not save a resume point that becomes locked when testing is disabled.
             else if(playing&&puzzle!=null&&!puzzle.Won)
@@ -233,8 +239,11 @@ namespace SockPairs
         }
         void NewScreen(string name)
         {
+            if(!authoring){ClearLiveContent();currentScreen=name;return;}
+#if UNITY_EDITOR
             animationEpoch++;UI.Clear(screen);UI.Clear(modal);UI.Clear(toastLayer);views.Clear();visuals.Clear();
             playing=false;finishing=false;currentScreen=name;if(name!="map"&&name!="play")UI.RoomBackground(screen,true);
+        #endif
         }
         void Header(string title,string subtitle)
         {
@@ -272,6 +281,8 @@ namespace SockPairs
         }
         void Map(int chapter)
         {
+            if(!authoring){BindMap();return;}
+#if UNITY_EDITOR
             NewScreen("map");
             UI.RoomBackground(screen,false,"map");
             int next=save.active!=null&&save.active.level<=save.unlocked?save.active.level:save.unlocked;
@@ -285,6 +296,7 @@ namespace SockPairs
             MapNavigationButton("PLAY",0,830,UI.Pink,1,()=>{if(save.active!=null)Resume();else StartLevel(save.unlocked);});
             MapNavigationButton("Album",0,580,UI.Purple,2,Album);
             FitMapLayout();
+        #endif
         }
         void MapNavigationButton(string title,float x,float width,Color color,int icon,Action action)
         {
@@ -306,7 +318,9 @@ namespace SockPairs
 
         void Shop()
         {
-            if(!CashShopAvailable)return;
+            if(!authoring){BindShop();return;}
+#if UNITY_EDITOR
+            if(!CashShopAvailable&&!authoring)return;
             NewScreen("shop");MapHud();
             var offers=UI.Rect(screen,"Shop content",0,0,1080,1920);
             var awning=UI.Label(offers,"A little help with the laundry",0,690,950,100,49);SafeEdgeOffset.Pin(awning.rectTransform,1);
@@ -327,6 +341,7 @@ namespace SockPairs
             UI.Button(screen,"Back to Map",0,-805,650,135,UI.Purple,Home,54);
             FitShopLayout();
             
+        #endif
         }
         void PurchaseUnavailable(){Toast("Purchases are not enabled in this build. Earn coins by playing.");}
         void BuyPack()
@@ -337,6 +352,8 @@ namespace SockPairs
         int albumPage;
         void Album()
         {
+            if(!authoring){BindAlbum();return;}
+#if UNITY_EDITOR
             Map(-1);currentScreen="album";
             var overlay=UI.Rect(screen,"Album overlay",0,0,1080,1920);RewardBackdrop.Capture(overlay);
             var dim=UI.Box(overlay,"Album dim",0,0,1080,1920,new Color(.03f,.02f,.01f,.55f),false);dim.raycastTarget=true;dim.gameObject.AddComponent<FullBleed>();
@@ -383,9 +400,12 @@ namespace SockPairs
             }
             pager.PageChanged=page=>{albumPage=page;previous.interactable=page>0;next.interactable=page<3;for(int i=0;i<4;i++)dots[i].color=i==page?UI.Pink:UI.Purple;};
             pager.GoTo(albumPage,false);
+        #endif
         }
         void OpenAlbumItem(int design)
         {
+            if(!authoring){BindAlbumItem(design);return;}
+#if UNITY_EDITOR
             string[] colors={"Pink","Blue","Yellow","Green","Purple","Coral"};
             string[] patterns={"Stripes","Dots","Stars","Zigzags"};
             var panel=Modal(colors[design%6]+" "+patterns[design/6],1180);
@@ -395,10 +415,13 @@ namespace SockPairs
             UI.Label(panel,collected?"Collected":"Not collected yet",0,-200,720,70,48,UI.Ink);
             UI.Label(panel,collected?"You matched this design!":"Match this design in a level\nto add it to your album.",0,-295,720,110,40,UI.Ink);
             UI.Button(panel,"Done",0,-435,620,125,UI.Pink,CloseModal,54);
+        #endif
         }
 
         void Room()
         {
+            if(!authoring){BindRoom();return;}
+#if UNITY_EDITOR
             NewScreen("room");Header("YOUR LAUNDRY", "Make a little space your own");Coins(screen);
             string[] names={"Sunny morning","Mint daydream","Rose cottage","Lavender evening"};
             Color[] colors={UI.Hex("F2DDBB"),UI.Hex("D3EAE0"),UI.Hex("F5D5DE"),UI.Hex("E1D5F1")};
@@ -417,9 +440,12 @@ namespace SockPairs
                 },30);
             }
             UI.Label(screen,"Decorations are earned with play. No purchases.",0,-871,990,65,25);PinScreenEdges();
+        #endif
         }
         void Settings()
         {
+            if(!authoring){BindSettings();return;}
+#if UNITY_EDITOR
             var panel=Modal("Settings",1360);
             Toggle(panel,"Sound",save.sound,250,()=>save.sound=!save.sound);
             Toggle(panel,"Music",save.music,70,()=>save.music=!save.music);
@@ -427,6 +453,7 @@ namespace SockPairs
             Toggle(panel,"Reduced motion",save.reduceMotion,-290,()=>save.reduceMotion=!save.reduceMotion);
             
             UI.Button(panel,"Done",0,-450,680,135,UI.Pink,()=>{CloseModal();Persist();},64);
+        #endif
         }
         void Toggle(Transform panel,string text,bool on,float y,Action change)
         {
@@ -462,6 +489,8 @@ namespace SockPairs
         }
         void BuildPlay()
         {
+            if(!authoring){BindPlay();return;}
+#if UNITY_EDITOR
             animationEpoch++;UI.Clear(screen);views.Clear();visuals.Clear();UI.RoomBackground(screen,puzzle.layout.config.basket>0);
             UI.Panel(screen,"Cream play surface",0,-185,1030,1490,UI.Board);
             var c=puzzle.layout.config;
@@ -516,6 +545,7 @@ namespace SockPairs
             sockLayer=UI.ClippedLayer(screen,"Socks",early?590:695,-615);fxLayer=UI.ClippedLayer(screen,"Effects",early?590:695,-950);
             PinScreenEdges();SafeEdgeOffset.Pin(drawerLayer,-1);
             DrawSocks(null);UpdateStatus();
+        #endif
         }
         void BuildPlayHeader(int level,int pairs,float titleY,float titleHeight)
         {
@@ -560,6 +590,7 @@ namespace SockPairs
         }
         void DrawDrawer()
         {
+            if(authoring)return;
             UI.Clear(drawerLayer);
             if(puzzle.layout.config.basket==0)
             {
@@ -616,6 +647,7 @@ namespace SockPairs
         }
         void DrawSocks(Dictionary<int,Vector2> old)
         {
+            if(authoring)return;
             foreach(int gone in views.Keys.Where(id=>puzzle.Socks[id].place==Place.Gone).ToArray())
             {if(views[gone])Destroy(views[gone].gameObject);views.Remove(gone);visuals.Remove(gone);}
             foreach(var s in puzzle.Socks.Where(s=>s.place!=Place.Gone).OrderByDescending(s=>s.place==Place.Pile?s.depth:-1))
@@ -632,25 +664,16 @@ namespace SockPairs
                 if(s.line&&s.place==Place.Pile)scale*=.75f;
                 if(!views.TryGetValue(id,out var r)||!r)
                 {
-                    r=UI.Rect(sockLayer,"Sock "+id,pos.x,pos.y,136,173);views[id]=r;
-                    var visual=r.gameObject.AddComponent<SockVisual>();visuals[id]=visual;
-                    var selection=UI.Rect(r,"Selection glow",0,0,205,205);visual.selection=selection.gameObject;
-                    UI.Circle(selection,"Selected fill",0,0,205,new Color(1,.75f,.3f,.12f));
-                    UI.Glyph(selection,"halo",0,0,205,UI.Gold);
-                    visual.shadow=UI.Sprite(r,"Soft shadow",sockArt[s.design],5,-8,160*scale,173*scale,new Color(.25f,.12f,.42f,.12f));
-                    visual.art=UI.Sprite(r,"Sock art",sockArt[s.design],0,0,160*scale,173*scale);
-                    visual.hit=UI.Box(r,"Tap target",0,0,136,173,Color.clear,false);
-                    var b=r.gameObject.AddComponent<Button>();b.targetGraphic=visual.art;b.transition=Selectable.Transition.None;b.onClick.AddListener(()=>Tap(id));
-                    if(s.odd){UI.Box(r,"Hole",8,-24,31,40,UI.Hex("624A45"));UI.Label(r,"!",8,-24,40,48,34,UI.Cream);}
-                    visual.knot=UI.Label(r,"~X~",0,0,140,70,37,UI.Cream).gameObject;
-                    visual.gate=UI.Label(r,"",0,-45,150,50,34,UI.Ink);UI.Stroke(visual.gate,UI.Cream,2);
-                    visual.hint=UI.Box(r,"Hint dot",0,95,23,23,UI.Gold).gameObject;
-                    if(s.size!=1)UI.Label(r,s.size==0?"S":"L",-45,65,60,50,34,UI.Ink);
+                    var instance=Instantiate(sockTemplate,sockLayer);instance.gameObject.SetActive(true);
+                    r=(RectTransform)instance.transform;r.name="Sock "+id;views[id]=r;visuals[id]=instance;
+                    instance.art.sprite=instance.shadow.sprite=sockArt[s.design];
+                    instance.GetComponent<Button>().onClick.AddListener(()=>Tap(id));
+                    instance.hole.SetActive(s.odd);instance.sizeLabel.gameObject.SetActive(s.size!=1);instance.sizeLabel.text=s.size==0?"S":"L";
                 }
                 r.SetParent(s.place==Place.Basket?fxLayer:sockLayer,false);
                 var v=visuals[id];v.art.color=available?Color.white:new Color(.67f,.64f,.61f,.72f);
                 if(v.movement!=null){StopCoroutine(v.movement);v.movement=null;}
-                v.art.rectTransform.sizeDelta=Vector2.one*(160*scale);
+                v.art.rectTransform.sizeDelta=sockTemplate.art.rectTransform.sizeDelta*scale;
                 v.shadow.rectTransform.sizeDelta=v.art.rectTransform.sizeDelta;
                 v.selection.transform.localScale=Vector3.one*(160*scale/180f);
                 v.hit.raycastTarget=exposed;
@@ -667,7 +690,7 @@ namespace SockPairs
         }
         void Tap(int id)
         {
-            if(!playing||finishing||hostPaused||modal.childCount>0)return;
+            if(!playing||finishing||hostPaused||HasOpenPopup)return;
             lastTap=Time.unscaledTime;if(idleHand){Destroy(idleHand.gameObject);idleHand=null;}
             var s=puzzle.Socks[id];
             var old=views.ToDictionary(k=>k.Key,k=>k.Value.anchoredPosition);
@@ -704,7 +727,7 @@ namespace SockPairs
             if(basketLabel)basketLabel.text="Waiting socks  "+puzzle.basket.Count+" / "+puzzle.capacity;
             bool full=puzzle.capacity>0&&puzzle.basket.Count>=puzzle.capacity-1;
             statusLabel.text=full?"Basket almost full!":puzzle.selected>=0?"Now find its partner":"Find a pair";
-            statusLabel.color=UI.Ink;statusLabel.fontSize=statusLabel.text.Length>16?40:earlyTitleSize(statusLabel.rectTransform.rect.height);
+            statusLabel.color=authoring?UI.Ink:normalStatusColor;statusLabel.fontSize=authoring?(statusLabel.text.Length>16?40:earlyTitleSize(statusLabel.rectTransform.rect.height)):(statusLabel.text.Length>16?Mathf.Min(40,normalStatusSize):normalStatusSize);
         }
 
         IEnumerator MatchEffect(int design,Vector2 a,Vector2 b)
@@ -799,23 +822,31 @@ namespace SockPairs
             save.active=null;playing=false;Persist();
             sound.Play("win");
             yield return new WaitForEndOfFrame();
+            if(!authoring){BindReward(reward,stars,level);yield break;}
+#if UNITY_EDITOR
             UI.Clear(toastLayer);UI.Clear(modal);RewardBackdrop.Capture(modal);
             var dim=UI.Box(modal,"Dim",0,0,1080,1920,new Color(.03f,.02f,.01f,.55f),false);dim.raycastTarget=true;dim.gameObject.AddComponent<FullBleed>();
             ReferenceBArt.Rim(modal);
             var panel=ReferenceReward.Build(modal,reward,save.collection.Count(x=>x),stars,level==100,()=>{if(level==100)Home();else StartLevel(level+1);});
             if(!save.reduceMotion)StartCoroutine(PanelPop(panel));
             StartCoroutine(Confetti());
+#endif
         }
         void Lose()
         {
+            if(!authoring){BindLose();return;}
+#if UNITY_EDITOR
             var panel=Modal("Basket full!",1240,UI.Pink);
             UI.Basket(panel,0,160,710,250);
             UI.Label(panel,"Add +1 space to\nmake a match!",0,-10,780,180,58,UI.Ink);
             UI.Button(panel,save.spots>0?"+1 Space   Use":"+1 Space   100",0,-235,740,145,UI.Pink,()=>BuyHelper("spot"),53);
             UI.Button(panel,"Retry",0,-410,700,140,UI.Purple,()=>StartLevel(puzzle.layout.config.level,false),62);
+        #endif
         }
         void Pause()
         {
+            if(!authoring){BindPause();return;}
+#if UNITY_EDITOR
             var panel=Modal("Pause",1320);
             UI.Button(panel,"Settings",-300,345,100,100,UI.Pink,Settings,36);
             UI.Box(panel,"Sound row",0,220,730,140,UI.Cream);
@@ -828,6 +859,7 @@ namespace SockPairs
             UI.Button(panel,"Restart",0,-280,720,140,UI.Purple,()=>StartLevel(puzzle.layout.config.level,false),72);
             UI.Button(panel,"Home",0,-445,720,140,UI.Purple,Home,72);
             Persist();
+        #endif
         }
         void SmallToggle(Transform parent,string title,float x,float y,bool on,Action toggle)
         {
@@ -839,6 +871,8 @@ namespace SockPairs
         }
         void Offer(string type)
         {
+            if(!authoring){BindOffer(type);return;}
+#if UNITY_EDITOR
             var panel=Modal(type=="spot"?"Extra Spot":type=="hint"?"Find Match":"Shuffle",1200,UI.Blue);
 
             UI.Circle(panel,"Helper background",0,120,230,UI.Mint);
@@ -849,6 +883,7 @@ namespace SockPairs
             UI.Button(panel,owned>0?"Use helper ("+owned+")":"Use "+cost+" coins",0,-205,700,135,UI.Pink,()=>BuyHelper(type),47);
             if(CanRewardHelper(type))
                 UI.Button(panel,"Watch ad for helper",0,-380,700,135,UI.Purple,()=>RewardHelper(type),46);
+        #endif
         }
         bool CanRewardHelper(string type)
         {
@@ -861,8 +896,7 @@ namespace SockPairs
             if(adUsed){Toast("The rewarded helper was already used for this level.");return;}
             if(type=="shuffle"){Toast("Shuffle is available with coins or a helper pack.");return;}
             var target=puzzle;
-            var panel=Modal("One moment...",820,UI.Purple);
-            UI.Label(panel,"Checking for an available ad",0,-60,600,130,36);
+            ShowPopup("Ad waiting");
             platform.Reward(type,earned=>
             {
                 if(puzzle!=target)return;
@@ -895,6 +929,8 @@ namespace SockPairs
         }
         void ShowTutorial(int level)
         {
+            if(!authoring){BindTutorial(level);return;}
+#if UNITY_EDITOR
             if(level==1){StartCoroutine(FirstPairTutorial());return;}
             string[] titles={"A laundry match","Meet your basket","Look a little closer","The odd one out","Wash day","Hanging out","All tangled up","A little damp","Big and little","The grand tidy"};
             string[] tips={"Tap a sock, then tap another with the same color and pattern.\nWatch them roll into a tidy ball!",
@@ -912,6 +948,7 @@ namespace SockPairs
             UI.Sprite(panel,"Example",sockArt[ch%24],-100,110,130,130);UI.Sprite(panel,"Example match",sockArt[ch%24],100,110,130,130);
             UI.Label(panel,string.IsNullOrEmpty(config.tutorialText)?tips[ch]:config.tutorialText,0,-110,710,310,40);
             UI.Button(panel,"Let's tidy!",0,-365,620,130,UI.Green,CloseModal,52);
+        #endif
         }
         RectTransform Modal(string title,float height,Color? ribbon=null)
         {
@@ -936,26 +973,21 @@ namespace SockPairs
         }
         RectTransform Hand(Vector2 position)
         {
-            var r=UI.Rect(fxLayer,"Tutorial glove",position.x+65,position.y-80,310,260);
-            UI.Sprite(r,"White glove",Resources.Load<Sprite>("Art/CandyHand"),0,0,310,260);
-            return r;
+            var r=Instantiate(handTemplate,fxLayer);r.gameObject.SetActive(true);r.anchoredPosition=position+handTemplate.anchoredPosition;return r;
         }
         IEnumerator FirstPairTutorial()
         {
             showingTutorial=true;int epoch=animationEpoch;
             yield return new WaitForSecondsRealtime(.75f);
             if(epoch!=animationEpoch||puzzle.moves!=0){showingTutorial=false;yield break;}
-            var bubble=UI.Rect(fxLayer,"Tutorial instruction",0,-550,900,145);SafeEdgeOffset.Pin(bubble,-1);
-            UI.Panel(bubble,"Bubble",0,0,900,145,UI.Cream);
-            UI.Label(bubble,"Tap two identical socks\nto make a pair!",0,0,860,130,40);
+            var bubble=View("First pair hint");bubble.gameObject.SetActive(true);
             int[] pair={puzzle.layout.solution[0],puzzle.layout.solution[1]};
             for(int i=0;i<2;i++)
             {
                 if(epoch!=animationEpoch||puzzle.moves>i)break;
                 int target=i==0?pair[0]:puzzle.Hint();if(target<0)break;
                 var targetPosition=Position(puzzle.Socks[target]);
-                var glow=UI.Rect(fxLayer,"Tutorial tap glow",targetPosition.x,targetPosition.y,225,225);
-                UI.Circle(glow,"Soft gold light",0,0,225,new Color(1,.8f,.2f,.13f));UI.Glyph(glow,"halo",0,0,225,UI.Gold);
+                var glow=Instantiate(glowTemplate,fxLayer);glow.gameObject.SetActive(true);glow.anchoredPosition=targetPosition;
                 var hand=Hand(targetPosition);idleHand=hand;
                 Vector2 start=hand.anchoredPosition;
                 while(epoch==animationEpoch&&puzzle.moves==i&&hand)
@@ -965,7 +997,7 @@ namespace SockPairs
                 }
                 if(hand)Destroy(hand.gameObject);if(glow)Destroy(glow.gameObject);idleHand=null;
             }
-            if(bubble)Destroy(bubble.gameObject);showingTutorial=false;lastTap=Time.unscaledTime;
+            if(bubble)bubble.gameObject.SetActive(false);showingTutorial=false;lastTap=Time.unscaledTime;
         }
         IEnumerator IdleHint()
         {
@@ -995,9 +1027,10 @@ namespace SockPairs
         }
         IEnumerator PanelPop(RectTransform panel)
         {
+            var authoredScale=panel.localScale;
             for(float t=0;t<.2f;t+=Time.unscaledDeltaTime)
-            {if(!panel)yield break;float u=t/.2f;panel.localScale=Vector3.one*(.9f+.1f*u+Mathf.Sin(u*Mathf.PI)*.045f);yield return null;}
-            if(panel)panel.localScale=Vector3.one;
+            {if(!panel)yield break;float u=t/.2f;panel.localScale=authoredScale*(.9f+.1f*u+Mathf.Sin(u*Mathf.PI)*.045f);yield return null;}
+            if(panel)panel.localScale=authoredScale;
         }
         bool doubling;
         void DoubleCoins(int reward)
@@ -1009,7 +1042,8 @@ namespace SockPairs
         IEnumerator Confetti()
         {
             if(save.reduceMotion)yield break;
-            var layer=UI.Rect(modal,"Confetti",0,0,1080,1920);
+            var layer=UI.Rect(activePopup?activePopup.transform:modal,"Confetti",0,0,1080,1920);
+            liveConfetti=layer;
             var pieces=new List<RectTransform>();var starts=new List<Vector2>();var speeds=new List<Vector2>();
             Color[] colors={UI.Pink,UI.Blue,UI.Gold,UI.Green,UI.Purple,Color.white};
             for(int i=0;i<20;i++)
@@ -1024,13 +1058,16 @@ namespace SockPairs
                 for(int i=0;i<pieces.Count;i++){pieces[i].anchoredPosition=starts[i]+speeds[i]*t+Vector2.down*200*t*t;pieces[i].localRotation=Quaternion.Euler(0,0,t*150+i*37);}
                 yield return null;
             }
-            if(layer)Destroy(layer.gameObject);
+            if(layer)Destroy(layer.gameObject);if(liveConfetti==layer)liveConfetti=null;
         }
-        void CloseModal(){UI.Clear(modal);}
+        void CloseModal(){if(authoring){UI.Clear(modal);return;}if(liveConfetti){liveConfetti.gameObject.SetActive(false);Destroy(liveConfetti.gameObject);liveConfetti=null;}if(popupAnimation!=null){StopCoroutine(popupAnimation);popupAnimation=null;}if(animatedPanel)animatedPanel.localScale=panelScale;animatedPanel=null;foreach(var view in sceneViews)if(view.transform.parent==modal)view.gameObject.SetActive(false);activePopup=null;}
         void Toast(string message)
         {
+            if(!authoring){ShowSceneToast(message);return;}
+#if UNITY_EDITOR
             UI.Clear(toastLayer);var r=UI.Box(toastLayer,"Message",0,700,960,110,UI.Ink).rectTransform;
             UI.Label(r,message,0,0,910,95,40,UI.Cream);StartCoroutine(RemoveToast(r));
+        #endif
         }
         IEnumerator RemoveToast(RectTransform r){yield return new WaitForSecondsRealtime(3);if(r)Destroy(r.gameObject);}
         static string TimeText(float time){int s=(int)time;return(s/60).ToString("00")+":"+(s%60).ToString("00");}

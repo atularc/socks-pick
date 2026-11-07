@@ -11,7 +11,7 @@ namespace SockPairs
         public Action<bool> AudioChanged;
         public bool youtube, ready, audioAllowed=true, rewardedAdsAvailable;
         Action<bool> rewardCallback;
-        static string SaveKey => Array.IndexOf(Environment.GetCommandLineArgs(),"-sockQA")>=0?"sock-pairs-qa-v1":"sock-pairs-save-v1";
+        static string SaveKey => Array.IndexOf(Environment.GetCommandLineArgs(),"-sockCanvasQA")>=0?"sock-pairs-canvas-qa-v1":Array.IndexOf(Environment.GetCommandLineArgs(),"-sockQA")>=0?"sock-pairs-qa-v1":"sock-pairs-save-v1";
         #if UNITY_WEBGL && !UNITY_EDITOR
         [DllImport("__Internal")] static extern void SP_Init(string name);
         [DllImport("__Internal")] static extern void SP_Save(string json);

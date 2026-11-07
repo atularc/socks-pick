@@ -14,9 +14,11 @@ const fs=require('fs'),assert=require('assert');
  await page.route('**/*.loader.js',async route=>{await loaderGate;await route.continue();});
  await page.goto(root,{waitUntil:'domcontentloaded'});await page.screenshot({path:output+'/loading-browser.png'});
  const start=Date.now();releaseLoader();await loaded();const loadMs=Date.now()-start;
- const lockedMap=await page.screenshot({path:output+'/map.png'});
+ assert.equal((await state()).active.level,1,'Startup opens gameplay directly');
+ await page.mouse.click(461,101);await page.waitForTimeout(350);await page.mouse.click(270,718);await page.waitForTimeout(350);
+ const mapSave=await state();const lockedMap=await page.screenshot({path:output+'/map.png'});
  await page.mouse.click(248,642);await page.waitForTimeout(300);
- assert(!(await state())?.active?.level,'Locked map nodes must not start levels in a release build');
+ assert.equal((await state())?.active?.level,mapSave?.active?.level,'Locked map nodes must not change the active level in a release build');
  assert(lockedMap.equals(await page.screenshot()),'Clicking a locked level must leave the map visible and unchanged');
  await page.mouse.click(270,861);await page.waitForTimeout(400);await page.screenshot({path:output+'/album.png'});
  assert(!lockedMap.equals(await page.screenshot()),'Album button must open a different screen');
@@ -41,7 +43,7 @@ const fs=require('fs'),assert=require('assert');
  await page.mouse.click(270,772);await page.waitForTimeout(850);assert.equal((await state()).active.level,2);
  // A separate test save unlocks the map so scrolling to its end can be exercised.
  await page.addInitScript(()=>{const s=JSON.parse(localStorage.getItem('sock-pairs-save-v1'));if(s){s.unlocked=100;s.active=null;localStorage.setItem('sock-pairs-save-v1',JSON.stringify(s));}});
- await page.reload();await loaded();assert.equal((await state()).unlocked,100);const beforeScroll=await page.screenshot({path:output+'/map-100.png'});
+ await page.reload();await loaded();assert.equal((await state()).unlocked,100);await page.mouse.click(461,101);await page.waitForTimeout(350);await page.mouse.click(270,718);await page.waitForTimeout(350);const beforeScroll=await page.screenshot({path:output+'/map-100.png'});
  await page.mouse.move(270,450);await page.mouse.wheel(0,-400);await page.waitForTimeout(750);const afterScroll=await page.screenshot({path:output+'/map-scrolled.png'});assert(!beforeScroll.equals(afterScroll),'The level map must actually scroll');
  await page.setViewportSize({width:960,height:540});await page.waitForTimeout(500);await page.screenshot({path:output+'/landscape.png'});
  for(const size of [{width:360,height:640},{width:540,height:1170},{width:768,height:1024}]){await page.setViewportSize(size);await page.waitForTimeout(500);await page.screenshot({path:output+'/map-'+size.width+'x'+size.height+'.png'});}

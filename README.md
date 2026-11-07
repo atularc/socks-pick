@@ -1,6 +1,6 @@
 # Sock Pairs
 
-Latest gameplay update: [opening progression and validation](Documentation/Opening-Progression/README.md). Layers begin at level 3 and the basket at level 4; this update leaves the GUI design unchanged. Open the project with Unity 6000.3.17f1. Build packages, caches, generated screenshots, and historical backup folders are excluded from Git. Build locally using the commands below; later design notes describe earlier iterations.
+Latest update: [editable Canvas screens, direct startup, and build measurements](Documentation/Scene-Canvas/README.md). The game starts level 1 or resumes the player's round directly. All 29 screens/overlays are saved in the Canvas; select one and use **Preview this screen in Canvas** to edit it. Layers begin at level 3 and the basket at level 4. Open with Unity 6000.3.17f1. Build packages, caches, generated screenshots, and historical backup folders are excluded from Git. Later design notes describe earlier iterations.
 
 A portrait Unity puzzle game based on the supplied **Color Sort Game Ideas** document.
 
@@ -8,7 +8,7 @@ A portrait Unity puzzle game based on the supplied **Color Sort Game Ideas** doc
 
 1. Add this folder in Unity Hub using **Unity 6000.3.17f1**.
 2. Open `Assets/Scenes/Laundry.unity` and press Play, or choose **Sock Pairs > Play the game**.
-3. Scroll the level map vertically. Press the large Play button to start or resume.
+3. Gameplay opens directly. Use **Pause > Home** to reach the scrolling level map.
 
 The project uses a small dependency set: uGUI, built-in Unity modules, C#, compact JSON data and sprite atlases. No paid plugins, accounts or backend are needed to play.
 

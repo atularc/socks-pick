@@ -1,0 +1,34 @@
+{
+  "result": "PASS",
+  "units": "MB = 1,000,000 bytes",
+  "screens": 29,
+  "initialWasmHeapBytes": 67108864,
+  "cloneFolderGuidDifferences": [
+    "Assets\\Resources\\Shaders.meta"
+  ],
+  "artifacts": [
+    {
+      "target": "Web",
+      "archive": "Builds\\Web.zip",
+      "archiveBytes": 7586863,
+      "archiveMB": 7.587,
+      "previousArchiveBytes": 7531290,
+      "changeBytes": 55573,
+      "changePercent": 0.74,
+      "exportedFilesBytes": 7668262,
+      "sha256": "ea5321aa5a6c15a18bfc98b82061cac203c7fcb2d44dcf9c83698b248135e325"
+    },
+    {
+      "target": "YouTube",
+      "archive": "Builds\\SockPairs-YouTube.zip",
+      "archiveBytes": 9512086,
+      "archiveMB": 9.512,
+      "previousArchiveBytes": 9447744,
+      "changeBytes": 64342,
+      "changePercent": 0.68,
+      "exportedFilesBytes": 23489472,
+      "sha256": "bc468a177a56fcb889acd8d9aa2fce246583ba0ba32e350b37ed171556b63b06"
+    }
+  ],
+  "note": "YouTube upload files are uncompressed; serving compression is controlled by the host."
+}

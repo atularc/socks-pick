@@ -7,10 +7,14 @@ namespace SockPairs
     public class LevelMapView:MonoBehaviour
     {
         const float Step=165,Height=16700;
-        class Row {public RectTransform root;public Image face,halo;public Text number;public GameObject locked,bubble;public Button button;public StarGraphic[] stars;public CandyPathGraphic path;public int level;}
-        Row[] rows;RectTransform content,pathLayer,viewport;SaveData save;int current,lastFirst=-99;bool unlockAll;Action<int> play;
-        readonly float[] xs={-164,166,-18,247,-178,150,-44};
-        readonly float[] ys={0,34,309,464,634,738,893};
+        [Serializable] class Row {public RectTransform root;public Image face,halo;public Text number;public GameObject locked,bubble;public Button button;public StarGraphic[] stars;public CandyPathGraphic path;public int level;}
+        [SerializeField] Row[] rows;[SerializeField] RectTransform content,pathLayer,viewport;SaveData save;int current,lastFirst=-99;bool unlockAll;Action<int> play;
+        [Header("Route layout within each seven-level section")]
+        [SerializeField] float[] xs={-164,166,-18,247,-178,150,-44};
+        [SerializeField] float[] ys={0,34,309,464,634,738,893};
+        [Header("Optional node artwork overrides")]
+        public Sprite currentArtwork,completedArtwork,lockedArtwork;
+        public Color currentText=UI.Cream,otherText=UI.Ink;
         float Y(int index)=>100+(index/7)*1155+ys[index%7];
         public void Build(Transform parent,SaveData data,int next,Action<int> launch,bool unlockAllLevelsForTesting=false)
         {
@@ -24,6 +28,14 @@ namespace SockPairs
             scroll.content=content;scroll.viewport=viewport;rows=new Row[12];for(int i=0;i<12;i++)rows[i]=CreateRow();
             Canvas.ForceUpdateCanvases();scroll.verticalNormalizedPosition=1-Mathf.Clamp01(Mathf.Max(0,next-3)*Step/(Height-1100));
             scroll.onValueChanged.AddListener(_=>Refresh());Refresh();
+        }
+        public void Bind(SaveData data,int next,Action<int> launch,bool unlockAllLevelsForTesting=false)
+        {
+            save=data;current=next;play=launch;unlockAll=unlockAllLevelsForTesting;lastFirst=-99;
+            var scroll=viewport.GetComponent<ScrollRect>();scroll.StopMovement();
+            foreach(var row in rows){var entry=row;entry.button.onClick.RemoveAllListeners();entry.button.onClick.AddListener(()=>{SockGame.Instance?.ButtonSound();play(entry.level);});}
+            scroll.onValueChanged.RemoveAllListeners();scroll.onValueChanged.AddListener(_=>Refresh());
+            Canvas.ForceUpdateCanvases();scroll.verticalNormalizedPosition=1-Mathf.Clamp01(Mathf.Max(0,next-3)*Step/(Height-viewport.rect.height));Refresh();
         }
         Row CreateRow()
         {
@@ -56,9 +68,10 @@ namespace SockPairs
                 if(index%7==6){a=-60;b=-100;}
                 row.path.gameObject.SetActive(index>0);row.path.Set(dx,index>0?-(Y(index)-Y(index-1)):-Step,a,b);
                 bool active=row.level==current,locked=row.level>save.unlocked,complete=save.stars[index]>0;
-                row.face.sprite=CosyArt.Get(active?"CosyCurrent":complete?"CosyGold":"CosyNode");row.face.color=Color.white;
+                var artwork=active?currentArtwork:complete?completedArtwork:lockedArtwork;
+                row.face.sprite=artwork?artwork:CosyArt.Get(active?"CosyCurrent":complete?"CosyGold":"CosyNode");row.face.color=Color.white;
                 row.halo.gameObject.SetActive(active);row.bubble.SetActive(active);row.locked.SetActive(locked);
-                row.number.text=row.level.ToString();row.number.color=active?UI.Cream:UI.Ink;row.number.rectTransform.anchoredPosition=new Vector2(0,locked||complete?25:0);
+                row.number.text=row.level.ToString();row.number.color=active?currentText:otherText;row.number.rectTransform.anchoredPosition=new Vector2(0,locked||complete?25:0);
                 row.button.interactable=!locked||unlockAll;
                 for(int star=0;star<3;star++){row.stars[star].gameObject.SetActive(complete);row.stars[star].color=star<save.stars[index]?UI.Gold:UI.Line;}
             }

@@ -34,11 +34,4 @@ namespace SockPairs
         }
     }
 
-    public class SockVisual : MonoBehaviour
-    {
-        public Image art,hit,shadow;
-        public GameObject knot,hint,selection;
-        public Text gate;
-        public Coroutine movement;
-    }
 }

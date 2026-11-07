@@ -134,6 +134,7 @@ __pycache__/
 !/Documentation/Reference/*.jpg
 !/Documentation/Theme-Options/*.png
 /Documentation/**/*.zip
+/Documentation/Scene-Canvas/original-scene-hash.json
 
 # Local credentials and signing material
 .env

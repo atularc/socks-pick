@@ -57,7 +57,7 @@ namespace SockPairs
         {var g=Rect(parent,kind,x,y,size,size).gameObject.AddComponent<CandyGlyph>();g.kind=kind;g.color=tint;g.raycastTarget=false;}
         public static void Switch(Transform parent,float x,float y,bool on,Action action)
         {var r=Rect(parent,"Toggle",x,y,178,94);var track=ClayBox(r,"Track",0,0,178,94,on?Green:Hex("A7BDB5"));track.raycastTarget=true;var knob=Circle(r,"White knob",on?42:-42,0,77,Cream);Box(r,"Touch area",0,0,178,132,Color.clear,false).raycastTarget=true;var b=r.gameObject.AddComponent<Button>();b.targetGraphic=track;b.onClick.AddListener(()=>{SockGame.Instance?.ButtonSound();on=!on;track.color=on?Green:Hex("A7BDB5");knob.rectTransform.anchoredPosition=new Vector2(on?42:-42,0);action();});}
-        public static void Clear(Transform t){for(int i=t.childCount-1;i>=0;i--){var child=t.GetChild(i).gameObject;child.SetActive(false);child.transform.SetParent(null,false);UnityEngine.Object.Destroy(child);}}
+        public static void Clear(Transform t){for(int i=t.childCount-1;i>=0;i--){var child=t.GetChild(i).gameObject;child.SetActive(false);child.transform.SetParent(null,false);if(Application.isPlaying)UnityEngine.Object.Destroy(child);else UnityEngine.Object.DestroyImmediate(child);}}
         public static void DisposeIcons(){basketArt=null;} // No dynamically created UI sprites to dispose.
         public static void Stars(Transform parent,int count,float x,float y,float size)
         {for(int i=0;i<3;i++){var r=Rect(parent,"Star",x+(i-1)*size*1.15f,y+(i==1?28:0),size,size);var g=r.gameObject.AddComponent<StarGraphic>();g.color=i<count?Gold:Line;g.raycastTarget=false;}}
