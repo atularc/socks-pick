@@ -19,6 +19,7 @@ namespace SockPairs.Editor
             EditorSceneManager.OpenScene(Scene);var game=UnityEngine.Object.FindFirstObjectByType<SockGame>();
             if(UnityEngine.Object.FindFirstObjectByType<Canvas>().GetComponentsInChildren<SceneView>(true).Length>0)throw new InvalidOperationException("Scene screens already exist; edit them directly.");
             game.BakeCanvasScreens();
+            ConfigureDynamicContent(UnityEngine.Object.FindFirstObjectByType<Canvas>());
             PersistGeneratedArt();
             Validate();EditorSceneManager.MarkSceneDirty(game.gameObject.scene);EditorSceneManager.SaveScene(game.gameObject.scene);
             AssetDatabase.SaveAssets();
@@ -46,7 +47,9 @@ namespace SockPairs.Editor
         [MenuItem("Sock Pairs/Authoring/Validate saved Canvas screens")]
         public static void Validate()
         {
-            var canvas=UnityEngine.Object.FindFirstObjectByType<Canvas>();var views=canvas.GetComponentsInChildren<SceneView>(true);
+            var canvas=UnityEngine.Object.FindFirstObjectByType<Canvas>();
+            if(!canvas)throw new InvalidOperationException("Open Assets/Scenes/Laundry.unity before validating its Canvas.");
+            var views=canvas.GetComponentsInChildren<SceneView>(true);
             if(views.Length<25)throw new Exception("The saved scene is missing Canvas screens.");
             if(views.Select(v=>v.id).Distinct().Count()!=views.Length)throw new Exception("Duplicate screen identifiers.");
             foreach(var view in views)
@@ -57,14 +60,34 @@ namespace SockPairs.Editor
             Debug.Log("CANVAS VALIDATION PASS: "+views.Length+" saved screens; "+views.Sum(v=>v.bindings.Count)+" serialized bindings.");
         }
         public static void CreateAndBuild(){Create();BuildTools.BrowserTargets();}
+        public static void ValidateSavedScene(){EditorSceneManager.OpenScene(Scene);Validate();}
         public static void FinalizeAndBuild()
         {
             EditorSceneManager.OpenScene(Scene);
             var canvas=UnityEngine.Object.FindFirstObjectByType<Canvas>();
-            var final=canvas.GetComponentsInChildren<SceneView>(true).First(v=>v.id=="Campaign complete");
-            final.Get<Button>("map").gameObject.SetActive(false); // The final panel already has its primary map action.
+            ConfigureDynamicContent(canvas);
             Validate();EditorSceneManager.MarkSceneDirty(canvas.gameObject.scene);EditorSceneManager.SaveScene(canvas.gameObject.scene);
             BuildTools.BrowserTargets();
+        }
+        static void ConfigureDynamicContent(Canvas canvas)
+        {
+            var views=canvas.GetComponentsInChildren<SceneView>(true);
+            var final=views.First(v=>v.id=="Campaign complete");
+            final.Get<Button>("map").gameObject.SetActive(false); // The final panel already has its primary map action.
+            ConfigureMapContent(views.First(v=>v.id=="Level map"));
+            foreach(var view in views.Where(v=>v.id=="Level complete"||v.id=="Campaign complete"))
+            {var amount=view.Get<Text>("coins");amount.resizeTextForBestFit=true;amount.resizeTextMinSize=40;amount.resizeTextMaxSize=67;}
+        }
+        static void ConfigureMapContent(SceneView view)
+        {
+            var button=view.Get<Button>("play");if(button.transform.Find("Editable button content"))return;
+            var label=view.Get<Text>("playLabel");var icon=button.GetComponentsInChildren<CandyGlyph>(true).First(g=>g.kind=="play");
+            var content=UI.Rect(button.transform,"Editable button content",0,2,760,151);
+            var group=content.gameObject.AddComponent<HorizontalLayoutGroup>();group.childAlignment=TextAnchor.MiddleCenter;
+            group.childControlWidth=group.childControlHeight=true;group.childForceExpandWidth=group.childForceExpandHeight=false;group.spacing=22;
+            icon.transform.SetParent(content,false);label.transform.SetParent(content,false);
+            var iconLayout=icon.gameObject.AddComponent<LayoutElement>();iconLayout.preferredWidth=iconLayout.minWidth=60;iconLayout.preferredHeight=iconLayout.minHeight=60;
+            var textLayout=label.gameObject.AddComponent<LayoutElement>();textLayout.minWidth=0;label.horizontalOverflow=HorizontalWrapMode.Overflow;
         }
     }
     [CustomEditor(typeof(SceneView))]

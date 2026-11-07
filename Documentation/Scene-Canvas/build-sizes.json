@@ -10,24 +10,24 @@
     {
       "target": "Web",
       "archive": "Builds\\Web.zip",
-      "archiveBytes": 7586863,
-      "archiveMB": 7.587,
+      "archiveBytes": 7588116,
+      "archiveMB": 7.588,
       "previousArchiveBytes": 7531290,
-      "changeBytes": 55573,
-      "changePercent": 0.74,
-      "exportedFilesBytes": 7668262,
-      "sha256": "ea5321aa5a6c15a18bfc98b82061cac203c7fcb2d44dcf9c83698b248135e325"
+      "changeBytes": 56826,
+      "changePercent": 0.75,
+      "exportedFilesBytes": 7669629,
+      "sha256": "129a09a16122574244b095dce5c2b1cc5a58c9dd31b7df40eeace8a40f4abfe7"
     },
     {
       "target": "YouTube",
       "archive": "Builds\\SockPairs-YouTube.zip",
-      "archiveBytes": 9512086,
+      "archiveBytes": 9512401,
       "archiveMB": 9.512,
       "previousArchiveBytes": 9447744,
-      "changeBytes": 64342,
+      "changeBytes": 64657,
       "changePercent": 0.68,
-      "exportedFilesBytes": 23489472,
-      "sha256": "bc468a177a56fcb889acd8d9aa2fce246583ba0ba32e350b37ed171556b63b06"
+      "exportedFilesBytes": 23489682,
+      "sha256": "8f4a158a79df8d4ecfb85ac5c0e88fcaa10cf260a773985160bfc593ab0e6a9a"
     }
   ],
   "note": "YouTube upload files are uncompressed; serving compression is controlled by the host."

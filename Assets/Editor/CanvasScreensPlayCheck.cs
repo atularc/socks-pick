@@ -96,6 +96,13 @@ namespace SockPairs.Editor
                 Check(Views().Select(v=>v.GetInstanceID()).OrderBy(v=>v).SequenceEqual(ids),"No screen recreated at level "+level);
                 if(new[]{1,3,4,41,51,100}.Contains(level))yield return Capture("gameplay-"+level);
             }
+            var map=original.First(v=>v.id=="Level map");
+            for(int level=1;level<=100;level++)
+            {
+                game.save.unlocked=level;game.save.active=null;game.Home();Canvas.ForceUpdateCanvases();
+                var label=map.Get<Text>("playLabel");
+                Check(label.preferredWidth<=label.rectTransform.rect.width+1,"Play label fits on one line at level "+level);
+            }
             // Apply a saved session as the platform does on startup, without routing through the map.
             game.save.unlocked=100;game.StartLevel(4,false);Call(game,"Tap",0);Call(game,"Tap",2);Call(game,"Persist");
             var saved=JsonUtility.ToJson(game.save);var expected=SaveData.Read(saved);Call(game,"OnLoaded",saved);

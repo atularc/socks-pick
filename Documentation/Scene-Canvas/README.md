@@ -41,8 +41,8 @@ Measured exports for this update:
 
 | Target | ZIP | Change from previous ZIP | Exported files |
 | --- | --- | --- | --- |
-| Web | 7.587 MB | +55.6 KB / +0.74% | 7.668 MB, already Brotli-compressed assets |
-| YouTube | 9.512 MB | +64.3 KB / +0.68% | 23.489 MB before host compression |
+| Web | 7.588 MB | +56.8 KB / +0.75% | 7.670 MB, already Brotli-compressed assets |
+| YouTube | 9.512 MB | +64.7 KB / +0.68% | 23.490 MB before host compression |
 
 MB and KB here use decimal bytes. The browser check retained a 64 MiB initial WebAssembly heap. Desktop automation verifies functionality, not low-end mobile frame rate.
 

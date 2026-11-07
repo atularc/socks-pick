@@ -1,7 +1,7 @@
 {
   "result": "PASS",
-  "testedAt": "2026-11-07T08:12:44.210Z",
-  "loadMs": 7050,
+  "testedAt": "2026-11-07T08:23:52.302Z",
+  "loadMs": 3318,
   "wasmHeapBytes": 67108864,
   "errors": [],
   "http": [],
